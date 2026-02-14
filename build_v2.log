@@ -1,0 +1,53 @@
+
+> video-editor@1.0.0 ios
+> expo run:ios
+
+› Skipping dev server
+› Planning build
+› Executing react-native Pods/hermes-engine » [CP-User] [Hermes] Replace Hermes for the right configuration, if needed
+› Executing react-native Pods/ReactNativeDependencies » [CP-User] [RNDeps] Replace React Native Dependencies for the right configuration, if needed
+› Preparing Pods/React-Core-React-Core_privacy » ResourceBundle-React-Core_privacy-React-Core-Info.plist
+› Preparing Pods/RNSVG-RNSVGFilters » ResourceBundle-RNSVGFilters-RNSVG-Info.plist
+› Preparing Pods/ExpoMediaLibrary-ExpoMediaLibrary_privacy » ResourceBundle-ExpoMediaLibrary_privacy-ExpoMediaLibrary-Info.plist
+› Preparing Pods/React-cxxreact-React-cxxreact_privacy » ResourceBundle-React-cxxreact_privacy-React-cxxreact-Info.plist
+› Preparing Pods/ExpoFileSystem-ExpoFileSystem_privacy » ResourceBundle-ExpoFileSystem_privacy-ExpoFileSystem-Info.plist
+› Preparing Pods/EXConstants-ExpoConstants_privacy » ResourceBundle-ExpoConstants_privacy-EXConstants-Info.plist
+› Preparing expo-constants Pods/EXConstants-EXConstants » ResourceBundle-EXConstants-EXConstants-Info.plist
+› Executing react-native Pods/React-Core-prebuilt » [CP-User] [RNDeps] Replace React Native Core for the right configuration, if needed
+› Executing react-native Pods/React-RCTFBReactNativeSpec » [CP-User] [RN]Check FBReactNativeSpec
+› Compiling @apescoding/ffmpeg-kit-react-native Pods/ffmpeg-kit-react-native » FFmpegKitReactNativeModule.mm
+
+❌  (ios/Pods/Headers/Public/React-Core/React/RCTBridgeModule.h:164:1)
+
+  162 |  * Example: dispatch_async(dispatch_get_main_queue, ^{ ... });
+  163 |  */
+> 164 | @property (nonatomic, strong, readonly) dispatch_queue_t methodQueue RCT_DEPRECATED;
+      | ^ property with 'retain ' attribute must be of object type
+  165 |
+  166 | /**
+  167 |  * Wrap the parameter line of your method implementation with this macro to
+
+› Compiling react-native-vision-camera Pods/VisionCamera » VisionCamera-dummy.m
+› Compiling react-native-vision-camera Pods/VisionCamera » CameraViewManager.m
+› Compiling react-native-vision-camera Pods/VisionCamera » CameraDevicesManager.m
+› Compiling react-native-safe-area-context Pods/react-native-safe-area-context » RNCSafeAreaViewComponentView.mm
+› Compiling react-native-safe-area-context Pods/react-native-safe-area-context » RNCSafeAreaViewState.cpp
+› Compiling react-native-safe-area-context Pods/react-native-safe-area-context » RNCSafeAreaContext.mm
+› Compiling react-native-safe-area-context Pods/react-native-safe-area-context » RNCSafeAreaProviderComponentView.mm
+› Compiling react-native-safe-area-context Pods/react-native-safe-area-context » RNCSafeAreaViewShadowNode.cpp
+› Compiling video-editor Pods/ReactAppDependencyProvider » RCTAppDependencyProvider.mm
+› Compiling react-native-reanimated Pods/RNReanimated » ViewStylesRepository.cpp
+› Compiling react-native-reanimated Pods/RNReanimated » vectors.cpp
+› Compiling react-native-reanimated Pods/RNReanimated » steps.cpp
+› Compiling video-editor Pods/ReactCodegen » rnreanimatedJSI-generated.cpp
+› Compiling video-editor Pods/ReactCodegen » rnreanimated-generated.mm
+› Compiling video-editor Pods/ReactCodegen » rngesturehandler_codegenJSI-generated.cpp
+› Packaging react-native-vision-camera Pods/VisionCamera » libVisionCamera.a
+› Compiling video-editor Pods/ReactCodegen » States.cpp
+› Compiling video-editor Pods/ReactCodegen » ShadowNodes.cpp
+› Compiling video-editor Pods/ReactCodegen » ShadowNodes.cpp
+    Run script build phase '[CP-User] [Hermes] Replace Hermes for the right configuration, if needed' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'hermes-engine' from project 'Pods')
+
+› 1 error(s), and 1 warning(s)
+
+CommandError: Failed to build iOS project. "xcodebuild" exited with error code 65.
