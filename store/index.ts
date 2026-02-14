@@ -1,17 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { setupListeners } from '@reduxjs/toolkit/query';
 import uiReducer from './slices/uiSlice';
-import { sampleApi } from './api/sampleApi';
 
 export const store = configureStore({
   reducer: {
     ui: uiReducer,
-    [sampleApi.reducerPath]: sampleApi.reducer,
+    // Additional slices will be added as sprints progress:
+    // camera: cameraReducer,       -- Sprint 2
+    // project: projectReducer,     -- Sprint 3
+    // timeline: timelineReducer,   -- Sprint 4
+    // transform: transformReducer, -- Sprint 5
+    // filter: filterReducer,       -- Sprint 6
+    // audio: audioReducer,         -- Sprint 7
+    // overlay: overlayReducer,     -- Sprint 8
+    // export: exportReducer,       -- Sprint 9
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sampleApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 });
-
-setupListeners(store.dispatch);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

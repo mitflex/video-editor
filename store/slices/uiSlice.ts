@@ -1,33 +1,50 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// ─── Editor Tool Tabs ────────────────────────────────────────
+export type EditorTool =
+  | 'trim'
+  | 'split'
+  | 'crop'
+  | 'rotate'
+  | 'speed'
+  | 'filters'
+  | 'adjust'
+  | 'audio'
+  | 'text';
+
+// ─── UI State ────────────────────────────────────────────────
 interface UiState {
-  theme: 'light' | 'dark';
-  counter: number;
+  theme: 'dark'; // Dark-only for MVP
+  activeModal: string | null;
+  activeToolTab: EditorTool | null;
+  isLoading: boolean;
+  loadingMessage: string | null;
 }
 
 const initialState: UiState = {
-  theme: 'light',
-  counter: 0,
+  theme: 'dark',
+  activeModal: null,
+  activeToolTab: null,
+  isLoading: false,
+  loadingMessage: null,
 };
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    toggleTheme(state) {
-      state.theme = state.theme === 'light' ? 'dark' : 'light';
+    setActiveModal(state, action: PayloadAction<string | null>) {
+      state.activeModal = action.payload;
     },
-    increment(state) {
-      state.counter += 1;
+    setActiveToolTab(state, action: PayloadAction<EditorTool | null>) {
+      state.activeToolTab = action.payload;
     },
-    decrement(state) {
-      state.counter -= 1;
-    },
-    setCounter(state, action: PayloadAction<number>) {
-      state.counter = action.payload;
+    setLoading(state, action: PayloadAction<{ isLoading: boolean; message?: string }>) {
+      state.isLoading = action.payload.isLoading;
+      state.loadingMessage = action.payload.message ?? null;
     },
   },
 });
 
-export const { toggleTheme, increment, decrement, setCounter } = uiSlice.actions;
+export const { setActiveModal, setActiveToolTab, setLoading } = uiSlice.actions;
 export default uiSlice.reducer;
