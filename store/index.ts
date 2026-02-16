@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import cameraReducer from './slices/cameraSlice';
 import exportReducer from './slices/exportSlice';
 import uiReducer from './slices/uiSlice';
 
@@ -6,8 +7,8 @@ export const store = configureStore({
   reducer: {
     ui: uiReducer,
     export: exportReducer,
+    camera: cameraReducer,
     // Additional slices will be added as sprints progress:
-    // camera: cameraReducer,       -- Sprint 2
     // project: projectReducer,     -- Sprint 3
     // timeline: timelineReducer,   -- Sprint 4
     // transform: transformReducer, -- Sprint 5
