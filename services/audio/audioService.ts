@@ -34,7 +34,7 @@ export async function mixAudioTracks(
   musicVolume: number,
   projectId: string,
   totalDurationMs?: number,
-  onProgress?: (progress: FFmpegProgress) => void
+  onProgress?: (progress: FFmpegProgress) => void,
 ): Promise<FFmpegResult> {
   const outputUri = createTempFile(projectId, 'mp4');
 
@@ -69,7 +69,7 @@ export async function replaceAudio(
   audioUri: string,
   projectId: string,
   totalDurationMs?: number,
-  onProgress?: (progress: FFmpegProgress) => void
+  onProgress?: (progress: FFmpegProgress) => void,
 ): Promise<FFmpegResult> {
   const outputUri = createTempFile(projectId, 'mp4');
 
@@ -100,11 +100,15 @@ export async function muteVideo(
   videoUri: string,
   projectId: string,
   totalDurationMs?: number,
-  onProgress?: (progress: FFmpegProgress) => void
+  onProgress?: (progress: FFmpegProgress) => void,
 ): Promise<FFmpegResult> {
   const outputUri = createTempFile(projectId, 'mp4');
 
-  const command = new CommandBuilder().input(videoUri).muteAudio().output(outputUri).build();
+  const command = new CommandBuilder()
+    .input(videoUri)
+    .muteAudio()
+    .output(outputUri)
+    .build();
 
   const result = await executeCommand(command, {
     totalDurationMs,
@@ -135,7 +139,7 @@ export async function overlayVoiceover(
   voiceoverVolume: number,
   projectId: string,
   totalDurationMs?: number,
-  onProgress?: (progress: FFmpegProgress) => void
+  onProgress?: (progress: FFmpegProgress) => void,
 ): Promise<FFmpegResult> {
   const outputUri = createTempFile(projectId, 'mp4');
 
@@ -169,7 +173,7 @@ export async function adjustVolume(
   volumePercent: number,
   projectId: string,
   totalDurationMs?: number,
-  onProgress?: (progress: FFmpegProgress) => void
+  onProgress?: (progress: FFmpegProgress) => void,
 ): Promise<FFmpegResult> {
   if (volumePercent === 100) {
     return {

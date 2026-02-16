@@ -41,7 +41,6 @@ export const CameraView = forwardRef<CameraViewHandle>(function CameraView(
 
   const facing = useAppSelector((s) => s.camera.facing);
   const flashMode = useAppSelector((s) => s.camera.flashMode);
-  const isRecording = useAppSelector((s) => s.camera.isRecording);
 
   const device = useCameraDevice(facing);
 
@@ -84,31 +83,22 @@ export const CameraView = forwardRef<CameraViewHandle>(function CameraView(
   // ── Render ──────────────────────────────────────────────
 
   if (!device) {
-    return <View style={styles.container} />;
+    return <View className="flex-1 bg-black" />;
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-black">
       <Camera
         ref={cameraRef}
         style={StyleSheet.absoluteFill}
         device={device}
-        isActive={!isRecording || true}
+        isActive
         video
         audio
         torch={flashMode}
       />
     </View>
   );
-});
-
-// ─── Styles ─────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
 });
 
 export default CameraView;

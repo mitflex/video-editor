@@ -8,7 +8,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
@@ -49,12 +49,15 @@ export function CameraControls() {
   const flashDisabled = facing === 'front';
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + SPACING.sm }]}>
+    <View
+      className="absolute top-0 left-0 right-0 flex-row justify-between items-center px-4 z-10"
+      style={{ paddingTop: insets.top + SPACING.sm }}
+    >
       {/* Close button */}
       <GlowIconButton icon="close" onPress={handleClose} transparent disabled={isRecording} />
 
       {/* Right-side controls */}
-      <View style={styles.rightControls}>
+      <View className="flex-row items-center gap-1">
         <GlowIconButton
           icon={flashMode === 'on' ? 'flash' : 'flash-outline'}
           onPress={handleToggleFlash}
@@ -78,26 +81,5 @@ export function CameraControls() {
     </View>
   );
 }
-
-// ─── Styles ─────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.base,
-    zIndex: 10,
-  },
-  rightControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-});
 
 export default CameraControls;
