@@ -8,7 +8,6 @@
  *    Idle      → Gradient circle, press to start
  *    Recording → Inner circle shrinks to stop square,
  *                outer ring shows progress
- *    Paused    → Pulsing ring
  * ============================================================
  */
 
@@ -19,10 +18,7 @@ import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  useAnimatedProps,
   withSpring,
-  withRepeat,
-  withTiming,
   interpolate,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -33,15 +29,13 @@ import { useAppSelector } from '@/store/hooks';
 
 // ─── Constants ──────────────────────────────────────────────
 
-const OUTER_SIZE = LAYOUT.recordButtonSize; // 72
-const INNER_SIZE = LAYOUT.recordButtonInnerSize; // 64
+const OUTER_SIZE = LAYOUT.recordButtonSize;       // 72
+const INNER_SIZE = LAYOUT.recordButtonInnerSize;  // 64
 const RING_PADDING = 6;
-const RING_SIZE = OUTER_SIZE + RING_PADDING * 2; // 84
+const RING_SIZE = OUTER_SIZE + RING_PADDING * 2;  // 84
 const RING_STROKE = 3;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
-
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // ─── Props ──────────────────────────────────────────────────
 
@@ -54,12 +48,10 @@ interface RecordButtonProps {
 
 export function RecordButton({ onPress, disabled = false }: RecordButtonProps) {
   const isRecording = useAppSelector((s) => s.camera.isRecording);
-  const isPaused = useAppSelector((s) => s.camera.isPaused);
   const recordingDurationMs = useAppSelector((s) => s.camera.recordingDurationMs);
   const maxDuration = useAppSelector((s) => s.camera.maxDuration);
 
   const scale = useSharedValue(1);
-  const pulseScale = useSharedValue(1);
 
   // ── Progress calculation ────────────────────────────────
 
@@ -70,32 +62,19 @@ export function RecordButton({ onPress, disabled = false }: RecordButtonProps) {
 
   const strokeDashoffset = RING_CIRCUMFERENCE * (1 - progress);
 
-  // ── Animated props for SVG circle ───────────────────────
-
-  const animatedCircleProps = useAnimatedProps(() => ({
-    strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress),
-  }));
-
   // ── Animations ──────────────────────────────────────────
 
-  const animatedScale = useAnimatedStyle(() => ({
+  const animatedWrapperStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+    opacity: disabled ? 0.4 : 1,
   }));
 
+  // Morphs the inner shape: idle = circle, recording = rounded square
   const innerAnimatedStyle = useAnimatedStyle(() => {
-    // Idle: full circle. Recording: shrink to stop square.
-    const size = isRecording
-      ? interpolate(1, [0, 1], [INNER_SIZE, INNER_SIZE * 0.45])
-      : INNER_SIZE;
-    const borderRadius = isRecording
-      ? interpolate(1, [0, 1], [INNER_SIZE / 2, 8])
-      : INNER_SIZE / 2;
-
-    return {
-      width: size,
-      height: size,
-      borderRadius,
-    };
+    const recordingProgress = isRecording ? 1 : 0;
+    const size = interpolate(recordingProgress, [0, 1], [INNER_SIZE, INNER_SIZE * 0.45]);
+    const borderRadius = interpolate(recordingProgress, [0, 1], [INNER_SIZE / 2, 8]);
+    return { width: size, height: size, borderRadius };
   });
 
   // ── Gesture ─────────────────────────────────────────────
@@ -124,20 +103,11 @@ export function RecordButton({ onPress, disabled = false }: RecordButtonProps) {
 
   return (
     <GestureDetector gesture={tapGesture}>
-      <Animated.View
-        style={[
-          styles.container,
-          disabled && styles.disabled,
-          animatedScale,
-        ]}
-      >
-        {/* Progress ring */}
-        <Svg
-          width={RING_SIZE}
-          height={RING_SIZE}
-          style={styles.ringSvg}
-        >
-          {/* Background ring track */}
+      <Animated.View style={[styles.wrapper, animatedWrapperStyle]}>
+
+        {/* SVG progress ring — absolute behind the button */}
+        <Svg width={RING_SIZE} height={RING_SIZE} style={StyleSheet.absoluteFill}>
+          {/* Track */}
           <Circle
             cx={RING_SIZE / 2}
             cy={RING_SIZE / 2}
@@ -148,7 +118,7 @@ export function RecordButton({ onPress, disabled = false }: RecordButtonProps) {
           />
           {/* Progress arc */}
           {isRecording && (
-            <AnimatedCircle
+            <Circle
               cx={RING_SIZE / 2}
               cy={RING_SIZE / 2}
               r={RING_RADIUS}
@@ -164,38 +134,36 @@ export function RecordButton({ onPress, disabled = false }: RecordButtonProps) {
           )}
         </Svg>
 
-        {/* Outer border ring */}
+        {/* Outer white border ring */}
         <View style={styles.outerRing}>
-          {/* Inner gradient body */}
+          {/* Warm gradient body */}
           <LinearGradient
             colors={gradientColors}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradientBody}
           >
-            {/* Morphing inner shape (circle -> stop square) */}
+            {/* Morphing inner shape (circle → stop square) */}
             <Animated.View style={[styles.innerShape, innerAnimatedStyle]} />
           </LinearGradient>
         </View>
+
       </Animated.View>
     </GestureDetector>
   );
 }
 
 // ─── Styles ─────────────────────────────────────────────────
+// NOTE: StyleSheet is kept here only for values that can't be
+// expressed as Tailwind classes — computed pixel dimensions,
+// border-radius derived from constants, and Animated style bases.
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     width: RING_SIZE,
     height: RING_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  disabled: {
-    opacity: 0.4,
-  },
-  ringSvg: {
-    position: 'absolute',
   },
   outerRing: {
     width: OUTER_SIZE,

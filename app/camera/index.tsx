@@ -14,7 +14,7 @@
  */
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,11 +24,10 @@ import { CameraView, type CameraViewHandle } from '@/components/camera/CameraVie
 import { RecordButton } from '@/components/camera/RecordButton';
 import { CameraControls } from '@/components/camera/CameraControls';
 import { useCameraPermissions } from '@/hooks/useCameraPermissions';
-import { COLORS, FONT_SIZE, SPACING } from '@/constants/theme';
+import { SPACING } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   setIsRecording,
-  setIsPaused,
   setRecordingDuration,
   resetCamera,
 } from '@/store/slices/cameraSlice';
@@ -48,7 +47,6 @@ export default function CameraScreen() {
   const { allGranted, requestPermissions } = useCameraPermissions();
 
   const isRecording = useAppSelector((s) => s.camera.isRecording);
-  const isPaused = useAppSelector((s) => s.camera.isPaused);
   const maxDuration = useAppSelector((s) => s.camera.maxDuration);
   const recordingDurationMs = useAppSelector((s) => s.camera.recordingDurationMs);
 
@@ -85,19 +83,6 @@ export default function CameraScreen() {
       timerRef.current = null;
     }
   }, []);
-
-  const pauseTimer = useCallback(() => {
-    stopTimer();
-    accumulatedRef.current += Date.now() - startTimeRef.current;
-  }, [stopTimer]);
-
-  const resumeTimer = useCallback(() => {
-    startTimeRef.current = Date.now();
-    timerRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTimeRef.current + accumulatedRef.current;
-      dispatch(setRecordingDuration(elapsed));
-    }, 100);
-  }, [dispatch]);
 
   // ── Auto-stop when hitting max duration ─────────────────
 
@@ -165,22 +150,21 @@ export default function CameraScreen() {
   // ── Format duration for display ─────────────────────────
 
   const formatDuration = (ms: number): string => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    return `${m.toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
   };
 
   // ── Permission denied fallback ──────────────────────────
 
   if (!allGranted) {
     return (
-      <View style={styles.permissionContainer}>
+      <View className="flex-1 bg-[#0A0A0F] items-center justify-center px-8">
         <StatusBar hidden />
-        <Text style={styles.permissionText}>
+        <Text className="text-[#F1F5F9] text-base text-center mb-2">
           Camera and microphone access are needed to record video.
         </Text>
-        <Text style={styles.permissionSubtext}>
+        <Text className="text-[#94A3B8] text-sm text-center">
           Please grant permissions in your device settings.
         </Text>
       </View>
@@ -190,93 +174,37 @@ export default function CameraScreen() {
   // ── Render ──────────────────────────────────────────────
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-black">
       <StatusBar hidden />
 
-      {/* Camera preview (full screen) */}
+      {/* Full-screen camera preview */}
       <CameraView ref={cameraRef} />
 
       {/* Top controls overlay */}
       <CameraControls />
 
-      {/* Recording duration label */}
+      {/* Recording duration badge */}
       {isRecording && (
-        <View style={[styles.durationContainer, { top: insets.top + 60 }]}>
-          <View style={styles.durationBadge}>
-            <View style={styles.recordingDot} />
-            <Text style={styles.durationText}>
+        <View
+          className="absolute left-0 right-0 items-center z-10"
+          style={{ top: insets.top + 60 }}
+        >
+          <View className="flex-row items-center bg-black/50 px-3 py-1 rounded-full gap-2">
+            <View className="w-2 h-2 rounded-full bg-[#EF4444]" />
+            <Text className="text-[#F1F5F9] text-sm">
               {formatDuration(recordingDurationMs)}
             </Text>
           </View>
         </View>
       )}
 
-      {/* Bottom: Record button */}
-      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + SPACING.xl }]}>
+      {/* Bottom record button */}
+      <View
+        className="absolute bottom-0 left-0 right-0 items-center pt-5"
+        style={{ paddingBottom: insets.bottom + SPACING.xl }}
+      >
         <RecordButton onPress={handleRecordPress} disabled={!allGranted} />
       </View>
     </View>
   );
 }
-
-// ─── Styles ─────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  permissionContainer: {
-    flex: 1,
-    backgroundColor: COLORS.bgPrimary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: SPACING['2xl'],
-  },
-  permissionText: {
-    color: COLORS.textPrimary,
-    fontSize: FONT_SIZE.md,
-    textAlign: 'center',
-    marginBottom: SPACING.sm,
-  },
-  permissionSubtext: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZE.base,
-    textAlign: 'center',
-  },
-  durationContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  durationBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderRadius: 20,
-    gap: SPACING.sm,
-  },
-  recordingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.recording,
-  },
-  durationText: {
-    color: COLORS.textPrimary,
-    fontSize: FONT_SIZE.base,
-    fontVariant: ['tabular-nums'],
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    paddingTop: SPACING.lg,
-  },
-});
