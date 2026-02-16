@@ -11,13 +11,9 @@
 
 import React, { forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
-import {
-  Camera,
-  useCameraDevice,
-  type VideoFile,
-} from 'react-native-vision-camera';
+import { Camera, useCameraDevice, type VideoFile } from 'react-native-vision-camera';
 
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '../../store/hooks';
 
 // ─── Public Handle ──────────────────────────────────────────
 
@@ -33,10 +29,7 @@ export interface CameraViewHandle {
 
 // ─── Component ──────────────────────────────────────────────
 
-export const CameraView = forwardRef<CameraViewHandle>(function CameraView(
-  _props,
-  ref,
-) {
+export const CameraView = forwardRef<CameraViewHandle>(function CameraView(_props, ref) {
   const cameraRef = useRef<Camera>(null);
 
   const facing = useAppSelector((s) => s.camera.facing);
@@ -58,7 +51,7 @@ export const CameraView = forwardRef<CameraViewHandle>(function CameraView(
         onRecordingError: options.onRecordingError,
       });
     },
-    [flashMode],
+    [flashMode]
   );
 
   const stopRecording = useCallback(async () => {
