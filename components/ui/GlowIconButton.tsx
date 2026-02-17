@@ -27,6 +27,7 @@ import Animated, {
   withRepeat,
   withTiming,
   cancelAnimation,
+  runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -113,7 +114,7 @@ export function GlowIconButton({
       scale.value = withSpring(1, ANIMATION.spring.button);
     })
     .onEnd(() => {
-      handlePress();
+      runOnJS(handlePress)();
     });
 
   return (

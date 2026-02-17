@@ -27,6 +27,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -101,7 +102,7 @@ export function AnimatedPill({
       scale.value = withSpring(1, ANIMATION.spring.pill);
     })
     .onEnd(() => {
-      handlePress();
+      runOnJS(handlePress)();
     });
 
   return (

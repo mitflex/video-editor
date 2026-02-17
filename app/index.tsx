@@ -1,184 +1,147 @@
+/**
+ * ============================================================
+ *  Home Screen (Temporary Dev Launcher)
+ *  Quick-access buttons to test Sprint 1 & 2 features.
+ *  This will be replaced by the real Home Screen in Sprint 10.
+ * ============================================================
+ */
+
 import React, { useState } from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { COLORS } from '../constants/theme';
-import {
-  GradientText,
-  GradientButton,
-  GlowIconButton,
-  AnimatedPill,
-  PremiumSlider,
-  GlassCard,
-  ShimmerLoader,
-} from '../components/ui';
+import { COLORS, SPACING } from '@/constants/theme';
+import { GradientText, GradientButton, GlassCard } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
+import { getFFmpegVersion } from '@/services/ffmpeg/ffmpegService';
 
 export default function Home() {
-  const [activePill, setActivePill] = useState<string>('1x');
-  const [sliderValue, setSliderValue] = useState<number>(50);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const router = useRouter();
+  const [ffmpegStatus, setFfmpegStatus] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  // ── Navigate to Camera ────────────────────────────────
+
+  const handleOpenCamera = () => {
+    router.navigate(ROUTES.CAMERA);
+  };
+
+  // ── Sprint 1 Diagnostic ───────────────────────────────
+
+  const handleCheckFFmpeg = async () => {
+    setChecking(true);
+    try {
+      const version = await getFFmpegVersion();
+      setFfmpegStatus(`FFmpeg OK: ${version}`);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setFfmpegStatus(`FFmpeg Error: ${msg}`);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg-primary">
+    <SafeAreaView className="flex-1 bg-[#0A0A0F]">
       <StatusBar style="light" />
-      <ScrollView contentContainerClassName="p-5 pb-10">
+      <ScrollView contentContainerStyle={{ padding: SPACING.lg, paddingBottom: 60 }}>
         {/* Header */}
-        <View className="mb-12">
-          <GradientText text="UI Showcase" size="3xl" />
-          <Text className="mt-1 text-base text-text-secondary">Premium Components Library</Text>
+        <View className="mb-8">
+          <GradientText text="Video Editor" size="3xl" />
+          <Text className="mt-1 text-base text-[#94A3B8]">Dev Launcher — Sprint 1 & 2 Testing</Text>
         </View>
 
-        {/* Gradient Buttons */}
-        <View className="mb-12">
-          <View className="mb-3">
-            <GradientText text="Gradient Buttons" size="xl" />
-          </View>
-          <View className="mb-2 flex-row flex-wrap items-center gap-3">
-            <GradientButton title="Primary" onPress={() => {}} />
-            <GradientButton title="Accent" gradient="accent" onPress={() => {}} />
-          </View>
-          <View className="mb-2 flex-row flex-wrap items-center gap-3">
-            <GradientButton title="Small" size="sm" onPress={() => {}} />
-            <GradientButton title="Large Glow" size="lg" glow onPress={() => {}} />
-          </View>
-          <View className="mb-2 flex-row flex-wrap items-center gap-3">
-            <GradientButton title="Loading" loading onPress={() => {}} />
-            <GradientButton title="Disabled" disabled onPress={() => {}} />
-          </View>
-          <GradientButton
-            title="Full Width Button"
-            fullWidth
-            gradient="success"
-            icon={<Ionicons name="checkmark-circle" size={20} color="white" />}
-            onPress={() => {}}
-            style={{ marginTop: 12 }}
-          />
-        </View>
-
-        {/* Glow Icon Buttons */}
-        <View className="mb-12">
-          <View className="mb-3">
-            <GradientText text="Glow Icon Buttons" size="xl" />
-          </View>
-          <View className="mb-2 flex-row flex-wrap items-center gap-3">
-            <GlowIconButton icon="camera" onPress={() => {}} />
-            <GlowIconButton
-              icon="radio-button-on"
-              active={isRecording}
-              gradient="error"
-              onPress={() => setIsRecording(!isRecording)}
-            />
-            <GlowIconButton icon="videocam" gradient="accent" onPress={() => {}} />
-            <GlowIconButton icon="mic-off" disabled onPress={() => {}} />
-          </View>
-          <View className="mb-2 mt-3 flex-row flex-wrap items-center gap-3">
-            <GlowIconButton icon="flash" transparent onPress={() => {}} />
-            <GlowIconButton icon="camera-reverse" transparent onPress={() => {}} />
-            <GlowIconButton icon="settings" transparent onPress={() => {}} />
-          </View>
-        </View>
-
-        {/* Animated Pills */}
-        <View className="mb-12">
-          <View className="mb-3">
-            <GradientText text="Animated Pills" size="xl" />
-          </View>
-          <View className="flex-row flex-wrap gap-2 self-start rounded-full bg-bg-tertiary p-2">
-            {['0.5x', '1x', '2x', '4x'].map((speed) => (
-              <AnimatedPill
-                key={speed}
-                label={speed}
-                active={activePill === speed}
-                onPress={() => setActivePill(speed)}
-              />
-            ))}
-          </View>
-          <View className="mt-3 flex-row flex-wrap gap-2 self-start rounded-full bg-bg-tertiary p-2">
-            <AnimatedPill label="Small" size="sm" active={false} onPress={() => {}} />
-            <AnimatedPill
-              label="Active"
-              size="sm"
-              active={true}
-              gradient="accent"
-              onPress={() => {}}
-            />
-          </View>
-        </View>
-
-        {/* Premium Slider */}
-        <View className="mb-12">
-          <View className="mb-3">
-            <GradientText text="Premium Slider" size="xl" />
-          </View>
+        {/* Sprint 2: Camera */}
+        <View className="mb-8">
+          <GradientText text="Sprint 2: Camera" size="xl" style={{ marginBottom: SPACING.md }} />
           <GlassCard>
-            <PremiumSlider
-              label="Brightness"
-              value={sliderValue}
-              min={0}
-              max={100}
-              onValueChange={setSliderValue}
-              gradient="primary"
-            />
-            <PremiumSlider
-              label="Contrast"
-              value={75}
-              min={0}
-              max={100}
-              onValueChange={() => {}}
-              gradient="accent"
-              style={{ marginTop: 12 }}
+            <View className="mb-3 flex-row items-center">
+              <Ionicons name="videocam" size={24} color={COLORS.accentPrimary} />
+              <Text className="ml-3 text-base font-semibold text-[#F1F5F9]">Record Video</Text>
+            </View>
+            <Text className="mb-4 text-sm text-[#94A3B8]">
+              Opens full-screen camera with record button, duration selector, countdown, grid
+              overlay, pause/resume, and progress bar.
+            </Text>
+            <GradientButton
+              title="Open Camera"
+              onPress={handleOpenCamera}
+              fullWidth
+              gradient="warm"
+              icon={<Ionicons name="camera" size={18} color="white" />}
             />
           </GlassCard>
         </View>
 
-        {/* Glass Cards */}
-        <View className="mb-12">
-          <View className="mb-3">
-            <GradientText text="Glass Cards" size="xl" />
-          </View>
-          <GlassCard style={{ marginBottom: 8 }}>
-            <Text className="text-base font-semibold text-text-primary">Standard Glass Card</Text>
-            <Text className="mt-1 text-sm text-text-secondary">
-              Blur intensity and border handling.
+        {/* Sprint 1: FFmpeg Check */}
+        <View className="mb-8">
+          <GradientText text="Sprint 1: Services" size="xl" style={{ marginBottom: SPACING.md }} />
+          <GlassCard>
+            <View className="mb-3 flex-row items-center">
+              <Ionicons name="construct" size={24} color={COLORS.accentSecondary} />
+              <Text className="ml-3 text-base font-semibold text-[#F1F5F9]">FFmpeg Diagnostic</Text>
+            </View>
+            <Text className="mb-4 text-sm text-[#94A3B8]">
+              Verifies the FFmpeg native module is linked and responding.
             </Text>
-          </GlassCard>
-
-          <GlassCard glow onPress={() => {}}>
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-base font-semibold text-text-primary">
-                  Interactive & Glowing
-                </Text>
-                <Text className="mt-1 text-sm text-text-secondary">
-                  Tap me to see press animation.
+            <GradientButton
+              title={checking ? 'Checking...' : 'Run FFmpeg Check'}
+              onPress={handleCheckFFmpeg}
+              fullWidth
+              gradient="primary"
+              loading={checking}
+              icon={!checking ? <Ionicons name="pulse" size={18} color="white" /> : undefined}
+            />
+            {ffmpegStatus && (
+              <View className="mt-3 rounded-xl bg-white/5 p-3">
+                <Text
+                  className={`font-mono text-sm ${ffmpegStatus.startsWith('FFmpeg OK') ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                  {ffmpegStatus}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color={COLORS.textSecondary} />
-            </View>
+            )}
           </GlassCard>
         </View>
 
-        {/* Shimmer Loaders */}
-        <View className="mb-12">
-          <View className="mb-3">
-            <GradientText text="Shimmer Loaders" size="xl" />
-          </View>
-          <View className="mb-2 flex-row flex-wrap items-center gap-3">
-            <ShimmerLoader width={60} height={60} borderRadius={30} />
-            <View style={{ flex: 1, marginLeft: 16 }}>
-              <ShimmerLoader width="80%" height={20} style={{ marginBottom: 8 }} />
-              <ShimmerLoader width="40%" height={16} />
-            </View>
-          </View>
-          <ShimmerLoader width="100%" height={120} borderRadius={16} style={{ marginTop: 12 }} />
+        {/* Feature Checklist */}
+        <View className="mb-8">
+          <GradientText text="What to Test" size="xl" style={{ marginBottom: SPACING.md }} />
+          <GlassCard>
+            <CheckItem label="Camera opens full-screen (no header)" />
+            <CheckItem label="Duration pills: 10s / 30s / 60s" />
+            <CheckItem label="Record button: warm gradient, morphs to stop square" />
+            <CheckItem label="Progress ring fills on record button" />
+            <CheckItem label="Top progress bar (red→orange gradient)" />
+            <CheckItem label="Flash / Flip / Grid / Close controls" />
+            <CheckItem label="Grid overlay toggles on/off" />
+            <CheckItem label="Pause button appears during recording" />
+            <CheckItem label="Duration badge shows elapsed time" />
+            <CheckItem label="PAUSED label when paused" />
+            <CheckItem label="Auto-stop at max duration" />
+            <CheckItem label="Preview screen with Retake / Use Video" />
+          </GlassCard>
         </View>
 
-        <View className="my-6 items-center">
-          <Text className="text-xs text-text-tertiary">Video Editor UI Kit v1.0</Text>
+        <View className="mb-6 mt-4 items-center">
+          <Text className="text-xs text-[#64748B]">Video Editor — Dev Build</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+// ─── Helper Component ─────────────────────────────────────
+
+function CheckItem({ label }: { label: string }) {
+  return (
+    <View className="flex-row items-center py-1.5">
+      <View className="mr-3 h-5 w-5 items-center justify-center rounded-full border border-[#6366F1]/30">
+        <View className="h-2 w-2 rounded-full bg-[#6366F1]/50" />
+      </View>
+      <Text className="flex-1 text-sm text-[#94A3B8]">{label}</Text>
+    </View>
   );
 }

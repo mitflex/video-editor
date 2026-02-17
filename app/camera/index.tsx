@@ -15,7 +15,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Alert, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -139,6 +139,8 @@ export default function CameraScreen() {
       dispatch(setIsPaused(false));
       stopTimer();
       accumulatedRef.current = 0;
+      const msg = error instanceof Error ? error.message : String(error);
+      Alert.alert('Recording Error', msg);
     },
     [dispatch, stopTimer]
   );
@@ -150,11 +152,20 @@ export default function CameraScreen() {
     dispatch(setRecordingDuration(0));
     accumulatedRef.current = 0;
     startTimer();
-    cameraRef.current?.startRecording({
-      onRecordingFinished: handleRecordingFinished,
-      onRecordingError: handleRecordingError,
-    });
-  }, [dispatch, startTimer, handleRecordingFinished, handleRecordingError]);
+    try {
+      cameraRef.current?.startRecording({
+        onRecordingFinished: handleRecordingFinished,
+        onRecordingError: handleRecordingError,
+      });
+    } catch (error) {
+      console.error('Start recording error:', error);
+      dispatch(setIsRecording(false));
+      stopTimer();
+      accumulatedRef.current = 0;
+      const msg = error instanceof Error ? error.message : String(error);
+      Alert.alert('Recording Error', msg);
+    }
+  }, [dispatch, startTimer, stopTimer, handleRecordingFinished, handleRecordingError]);
 
   const handleStartRecording = useCallback(() => {
     if (countdownDuration > 0) {
@@ -174,19 +185,35 @@ export default function CameraScreen() {
   const handleStopRecording = useCallback(async () => {
     stopTimer();
     dispatch(setIsPaused(false));
-    await cameraRef.current?.stopRecording();
+    try {
+      await cameraRef.current?.stopRecording();
+    } catch (error) {
+      console.error('Stop recording error:', error);
+      dispatch(setIsRecording(false));
+      accumulatedRef.current = 0;
+      const msg = error instanceof Error ? error.message : String(error);
+      Alert.alert('Recording Error', msg);
+    }
   }, [stopTimer, dispatch]);
 
   const handlePauseRecording = useCallback(async () => {
     pauseTimer();
     dispatch(setIsPaused(true));
-    await cameraRef.current?.pauseRecording();
+    try {
+      await cameraRef.current?.pauseRecording();
+    } catch (error) {
+      console.error('Pause recording error:', error);
+    }
   }, [pauseTimer, dispatch]);
 
   const handleResumeRecording = useCallback(async () => {
     dispatch(setIsPaused(false));
     resumeTimer();
-    await cameraRef.current?.resumeRecording();
+    try {
+      await cameraRef.current?.resumeRecording();
+    } catch (error) {
+      console.error('Resume recording error:', error);
+    }
   }, [resumeTimer, dispatch]);
 
   const handleRecordPress = useCallback(() => {

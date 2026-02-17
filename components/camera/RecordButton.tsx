@@ -20,6 +20,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   interpolate,
+  runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Circle } from 'react-native-svg';
@@ -94,7 +95,7 @@ export function RecordButton({ onPress, disabled = false }: RecordButtonProps) {
       scale.value = withSpring(1, ANIMATION.spring.button);
     })
     .onEnd(() => {
-      handlePress();
+      runOnJS(handlePress)();
     });
 
   // ── Render ──────────────────────────────────────────────
