@@ -1,238 +1,147 @@
+/**
+ * ============================================================
+ *  Home Screen (Temporary Dev Launcher)
+ *  Quick-access buttons to test Sprint 1 & 2 features.
+ *  This will be replaced by the real Home Screen in Sprint 10.
+ * ============================================================
+ */
+
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, Text } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { COLORS, SPACING, RADIUS } from '../constants/theme';
-import {
-  GradientText,
-  GradientButton,
-  GlowIconButton,
-  AnimatedPill,
-  PremiumSlider,
-  GlassCard,
-  ShimmerLoader,
-} from '../components/ui';
+import { COLORS, SPACING } from '@/constants/theme';
+import { GradientText, GradientButton, GlassCard } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
+import { getFFmpegVersion } from '@/services/ffmpeg/ffmpegService';
 
 export default function Home() {
-  const [activePill, setActivePill] = useState<string>('1x');
-  const [sliderValue, setSliderValue] = useState<number>(50);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const router = useRouter();
+  const [ffmpegStatus, setFfmpegStatus] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  // ── Navigate to Camera ────────────────────────────────
+
+  const handleOpenCamera = () => {
+    router.navigate(ROUTES.CAMERA);
+  };
+
+  // ── Sprint 1 Diagnostic ───────────────────────────────
+
+  const handleCheckFFmpeg = async () => {
+    setChecking(true);
+    try {
+      const version = await getFFmpegVersion();
+      setFfmpegStatus(`FFmpeg OK: ${version}`);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setFfmpegStatus(`FFmpeg Error: ${msg}`);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-[#0A0A0F]">
       <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={{ padding: SPACING.lg, paddingBottom: 60 }}>
         {/* Header */}
-        <View style={styles.section}>
-          <GradientText text="UI Showcase" size="3xl" />
-          <Text style={styles.subtitle}>Premium Components Library</Text>
+        <View className="mb-8">
+          <GradientText text="Video Editor" size="3xl" />
+          <Text className="mt-1 text-base text-[#94A3B8]">Dev Launcher — Sprint 1 & 2 Testing</Text>
         </View>
 
-        {/* Gradient Buttons */}
-        <View style={styles.section}>
-          <GradientText text="Gradient Buttons" size="xl" style={styles.sectionTitle} />
-          <View style={styles.row}>
-            <GradientButton title="Primary" onPress={() => {}} />
-            <GradientButton title="Accent" gradient="accent" onPress={() => {}} />
-          </View>
-          <View style={styles.row}>
-            <GradientButton title="Small" size="sm" onPress={() => {}} />
-            <GradientButton title="Large Glow" size="lg" glow onPress={() => {}} />
-          </View>
-          <View style={styles.row}>
-            <GradientButton title="Loading" loading onPress={() => {}} />
-            <GradientButton title="Disabled" disabled onPress={() => {}} />
-          </View>
-          <GradientButton
-            title="Full Width Button"
-            fullWidth
-            gradient="success"
-            icon={<Ionicons name="checkmark-circle" size={20} color="white" />}
-            onPress={() => {}}
-            style={styles.marginTop}
-          />
-        </View>
-
-        {/* Glow Icon Buttons */}
-        <View style={styles.section}>
-          <GradientText text="Glow Icon Buttons" size="xl" style={styles.sectionTitle} />
-          <View style={styles.row}>
-            <GlowIconButton icon="camera" onPress={() => {}} />
-            <GlowIconButton
-              icon="radio-button-on"
-              active={isRecording}
-              gradient="error"
-              onPress={() => setIsRecording(!isRecording)}
-            />
-            <GlowIconButton icon="videocam" gradient="accent" onPress={() => {}} />
-            <GlowIconButton icon="mic-off" disabled onPress={() => {}} />
-          </View>
-          <View style={[styles.row, styles.marginTop]}>
-            <GlowIconButton icon="flash" transparent onPress={() => {}} />
-            <GlowIconButton icon="camera-reverse" transparent onPress={() => {}} />
-            <GlowIconButton icon="settings" transparent onPress={() => {}} />
-          </View>
-        </View>
-
-        {/* Animated Pills */}
-        <View style={styles.section}>
-          <GradientText text="Animated Pills" size="xl" style={styles.sectionTitle} />
-          <View style={styles.pillContainer}>
-            {['0.5x', '1x', '2x', '4x'].map((speed) => (
-              <AnimatedPill
-                key={speed}
-                label={speed}
-                active={activePill === speed}
-                onPress={() => setActivePill(speed)}
-                style={styles.pill}
-              />
-            ))}
-          </View>
-          <View style={[styles.pillContainer, styles.marginTop]}>
-            <AnimatedPill label="Small" size="sm" active={false} onPress={() => {}} />
-            <AnimatedPill
-              label="Active"
-              size="sm"
-              active={true}
-              gradient="accent"
-              onPress={() => {}}
-            />
-          </View>
-        </View>
-
-        {/* Premium Slider */}
-        <View style={styles.section}>
-          <GradientText text="Premium Slider" size="xl" style={styles.sectionTitle} />
+        {/* Sprint 2: Camera */}
+        <View className="mb-8">
+          <GradientText text="Sprint 2: Camera" size="xl" style={{ marginBottom: SPACING.md }} />
           <GlassCard>
-            <PremiumSlider
-              label="Brightness"
-              value={sliderValue}
-              min={0}
-              max={100}
-              onValueChange={setSliderValue}
+            <View className="mb-3 flex-row items-center">
+              <Ionicons name="videocam" size={24} color={COLORS.accentPrimary} />
+              <Text className="ml-3 text-base font-semibold text-[#F1F5F9]">Record Video</Text>
+            </View>
+            <Text className="mb-4 text-sm text-[#94A3B8]">
+              Opens full-screen camera with record button, duration selector, countdown, grid
+              overlay, pause/resume, and progress bar.
+            </Text>
+            <GradientButton
+              title="Open Camera"
+              onPress={handleOpenCamera}
+              fullWidth
+              gradient="warm"
+              icon={<Ionicons name="camera" size={18} color="white" />}
+            />
+          </GlassCard>
+        </View>
+
+        {/* Sprint 1: FFmpeg Check */}
+        <View className="mb-8">
+          <GradientText text="Sprint 1: Services" size="xl" style={{ marginBottom: SPACING.md }} />
+          <GlassCard>
+            <View className="mb-3 flex-row items-center">
+              <Ionicons name="construct" size={24} color={COLORS.accentSecondary} />
+              <Text className="ml-3 text-base font-semibold text-[#F1F5F9]">FFmpeg Diagnostic</Text>
+            </View>
+            <Text className="mb-4 text-sm text-[#94A3B8]">
+              Verifies the FFmpeg native module is linked and responding.
+            </Text>
+            <GradientButton
+              title={checking ? 'Checking...' : 'Run FFmpeg Check'}
+              onPress={handleCheckFFmpeg}
+              fullWidth
               gradient="primary"
+              loading={checking}
+              icon={!checking ? <Ionicons name="pulse" size={18} color="white" /> : undefined}
             />
-            <PremiumSlider
-              label="Contrast"
-              value={75}
-              min={0}
-              max={100}
-              onValueChange={() => {}}
-              gradient="accent"
-              style={styles.marginTop}
-            />
-          </GlassCard>
-        </View>
-
-        {/* Glass Cards */}
-        <View style={styles.section}>
-          <GradientText text="Glass Cards" size="xl" style={styles.sectionTitle} />
-          <GlassCard style={styles.marginBottom}>
-            <Text style={styles.cardText}>Standard Glass Card</Text>
-            <Text style={styles.cardSubtext}>Blur intensity and border handling.</Text>
-          </GlassCard>
-
-          <GlassCard glow onPress={() => {}}>
-            <View style={styles.cardRow}>
-              <View>
-                <Text style={styles.cardText}>Interactive & Glowing</Text>
-                <Text style={styles.cardSubtext}>Tap me to see press animation.</Text>
+            {ffmpegStatus && (
+              <View className="mt-3 rounded-xl bg-white/5 p-3">
+                <Text
+                  className={`font-mono text-sm ${ffmpegStatus.startsWith('FFmpeg OK') ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                  {ffmpegStatus}
+                </Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color={COLORS.textSecondary} />
-            </View>
+            )}
           </GlassCard>
         </View>
 
-        {/* Shimmer Loaders */}
-        <View style={styles.section}>
-          <GradientText text="Shimmer Loaders" size="xl" style={styles.sectionTitle} />
-          <View style={styles.row}>
-            <ShimmerLoader width={60} height={60} borderRadius={30} />
-            <View style={{ flex: 1, marginLeft: 16 }}>
-              <ShimmerLoader width="80%" height={20} style={styles.marginBottom} />
-              <ShimmerLoader width="40%" height={16} />
-            </View>
-          </View>
-          <ShimmerLoader width="100%" height={120} borderRadius={16} style={styles.marginTop} />
+        {/* Feature Checklist */}
+        <View className="mb-8">
+          <GradientText text="What to Test" size="xl" style={{ marginBottom: SPACING.md }} />
+          <GlassCard>
+            <CheckItem label="Camera opens full-screen (no header)" />
+            <CheckItem label="Duration pills: 10s / 30s / 60s" />
+            <CheckItem label="Record button: warm gradient, morphs to stop square" />
+            <CheckItem label="Progress ring fills on record button" />
+            <CheckItem label="Top progress bar (red→orange gradient)" />
+            <CheckItem label="Flash / Flip / Grid / Close controls" />
+            <CheckItem label="Grid overlay toggles on/off" />
+            <CheckItem label="Pause button appears during recording" />
+            <CheckItem label="Duration badge shows elapsed time" />
+            <CheckItem label="PAUSED label when paused" />
+            <CheckItem label="Auto-stop at max duration" />
+            <CheckItem label="Preview screen with Retake / Use Video" />
+          </GlassCard>
         </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Video Editor UI Kit v1.0</Text>
+        <View className="mb-6 mt-4 items-center">
+          <Text className="text-xs text-[#64748B]">Video Editor — Dev Build</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bgPrimary,
-  },
-  scrollContent: {
-    padding: SPACING.lg,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: SPACING['3xl'],
-  },
-  subtitle: {
-    color: COLORS.textSecondary,
-    fontSize: 16,
-    marginTop: SPACING.xs,
-  },
-  sectionTitle: {
-    marginBottom: SPACING.md,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: SPACING.md,
-    marginBottom: SPACING.sm,
-  },
-  marginTop: {
-    marginTop: SPACING.md,
-  },
-  marginBottom: {
-    marginBottom: SPACING.sm,
-  },
-  pillContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
-    backgroundColor: COLORS.bgTertiary,
-    padding: SPACING.sm,
-    borderRadius: RADIUS.full,
-    alignSelf: 'flex-start',
-  },
-  pill: {
-    // marginBottom: SPACING.xs,
-  },
-  cardText: {
-    color: COLORS.textPrimary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  cardSubtext: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    marginTop: 4,
-  },
-  cardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  footer: {
-    alignItems: 'center',
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.xl,
-  },
-  footerText: {
-    color: COLORS.textTertiary,
-    fontSize: 12,
-  },
-});
+// ─── Helper Component ─────────────────────────────────────
+
+function CheckItem({ label }: { label: string }) {
+  return (
+    <View className="flex-row items-center py-1.5">
+      <View className="mr-3 h-5 w-5 items-center justify-center rounded-full border border-[#6366F1]/30">
+        <View className="h-2 w-2 rounded-full bg-[#6366F1]/50" />
+      </View>
+      <Text className="flex-1 text-sm text-[#94A3B8]">{label}</Text>
+    </View>
+  );
+}

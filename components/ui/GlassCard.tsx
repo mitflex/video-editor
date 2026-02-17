@@ -23,6 +23,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  runOnJS,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -75,7 +76,7 @@ export function GlassCard({
       scale.value = withSpring(1, ANIMATION.spring.button);
     })
     .onEnd(() => {
-      handlePress();
+      runOnJS(handlePress)();
     });
 
   const content = (

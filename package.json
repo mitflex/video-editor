@@ -10,7 +10,7 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "tsc": "npx tsc --noEmit",
     "web": "expo start --web",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package && bash scripts/patch-ffmpeg-kit.sh"
   },
   "dependencies": {
     "@apescoding/ffmpeg-kit-react-native": "^1.0.8",
