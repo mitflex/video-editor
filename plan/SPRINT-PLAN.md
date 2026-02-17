@@ -54,25 +54,25 @@ SPRINT 2  (Camera)           SPRINT 3  (Import + Clip Selector)
 
 | # | Task | Files | Status |
 |---|------|-------|--------|
-| 0.1 | Delete demo/placeholder code | Remove: `components/SampleComponent.tsx`, `components/ScreenContent.tsx`, `app/details/[id].tsx`, `store/api/sampleApi.ts`. Clean: `store/slices/uiSlice.ts` (remove counter), `store/index.ts` (remove sampleApi), `app/index.tsx` (remove SampleComponent import) | Pending |
+| 0.1 | Delete demo/placeholder code | Remove: `components/SampleComponent.tsx`, `components/ScreenContent.tsx`, `app/details/[id].tsx`, `store/api/sampleApi.ts`. Clean: `store/slices/uiSlice.ts` (remove counter), `store/index.ts` (remove sampleApi), `app/index.tsx` (remove SampleComponent import) | **Done** |
 | 0.2 | Create route & asset constants | `constants/routes.ts`, `constants/assets.ts` | **Done** |
-| 0.3 | Create theme constants | `constants/theme.ts` -- Full color palette, gradients, glass params, typography, spacing | Pending |
-| 0.4 | Create filter constants | `constants/filters.ts` -- FFmpeg filter preset strings (warm, cool, vintage, b&w) | Pending |
-| 0.5 | Create TypeScript types | `types/video.ts` (VideoMetadata, TrimRange, CropRect, ExportConfig), `types/project.ts` (Project, ProjectState), `types/overlay.ts` (TextOverlay, FontOption) | Pending |
-| 0.6 | Update app.json | Set `userInterfaceStyle: "dark"`, add permissions (camera, microphone, media-library, audio), add plugins (vision-camera, ffmpeg) | Pending |
-| 0.7 | Fix tsconfig path alias | Change `@/*` mapping from `src/*` to `./*` | Pending |
-| 0.8 | Update tailwind config | Add `services/`, `hooks/`, `store/`, `constants/` to content paths | Pending |
-| 0.9 | Install ALL dependencies | Single batch `yarn add` for all 17 libraries | Pending |
-| 0.10 | Run expo prebuild | `npx expo prebuild --clean` -- generate ios/ and android/ | Pending |
-| 0.11 | Verify dev build | Build and run on iOS Simulator | Pending |
-| 0.12 | Build GradientButton | `components/ui/GradientButton.tsx` | Pending |
-| 0.13 | Build GlassCard | `components/ui/GlassCard.tsx` | Pending |
-| 0.14 | Build GlassBottomSheet | `components/ui/GlassBottomSheet.tsx` | Pending |
-| 0.15 | Build GradientText | `components/ui/GradientText.tsx` | Pending |
-| 0.16 | Build GlowIconButton | `components/ui/GlowIconButton.tsx` | Pending |
-| 0.17 | Build PremiumSlider | `components/ui/PremiumSlider.tsx` | Pending |
-| 0.18 | Build AnimatedPill | `components/ui/AnimatedPill.tsx` | Pending |
-| 0.19 | Build ShimmerLoader | `components/ui/ShimmerLoader.tsx` | Pending |
+| 0.3 | Create theme constants | `constants/theme.ts` -- Full color palette, gradients, glass params, typography, spacing | **Done** |
+| 0.4 | Create filter constants | `constants/filters.ts` -- FFmpeg filter preset strings (warm, cool, vintage, b&w) | **Done** |
+| 0.5 | Create TypeScript types | `types/video.ts` (VideoMetadata, TrimRange, CropRect, ExportConfig), `types/project.ts` (Project, ProjectState), `types/overlay.ts` (TextOverlay, FontOption) | **Done** |
+| 0.6 | Update app.json | Set `userInterfaceStyle: "dark"`, add permissions (camera, microphone, media-library, audio), add plugins (vision-camera, ffmpeg) | **Done** |
+| 0.7 | Fix tsconfig path alias | Change `@/*` mapping from `src/*` to `./*` | **Done** |
+| 0.8 | Update tailwind config | Add `services/`, `hooks/`, `store/`, `constants/` to content paths | **Done** |
+| 0.9 | Install ALL dependencies | Single batch `yarn add` for all 17 libraries | **Done** |
+| 0.10 | Run expo prebuild | `npx expo prebuild --clean` -- generate ios/ and android/ | **Done** |
+| 0.11 | Verify dev build | Build and run on iOS Simulator | **Done** |
+| 0.12 | Build GradientButton | `components/ui/GradientButton.tsx` | **Done** |
+| 0.13 | Build GlassCard | `components/ui/GlassCard.tsx` | **Done** |
+| 0.14 | Build GlassBottomSheet | `components/ui/GlassBottomSheet.tsx` | **Done** |
+| 0.15 | Build GradientText | `components/ui/GradientText.tsx` | **Done** |
+| 0.16 | Build GlowIconButton | `components/ui/GlowIconButton.tsx` | **Done** |
+| 0.17 | Build PremiumSlider | `components/ui/PremiumSlider.tsx` | **Done** |
+| 0.18 | Build AnimatedPill | `components/ui/AnimatedPill.tsx` | **Done** |
+| 0.19 | Build ShimmerLoader | `components/ui/ShimmerLoader.tsx` | **Done** |
 
 **Acceptance:** Dev build compiles on iOS. All 8 UI primitives render correctly with gradients + glassmorphism + spring animations.
 
@@ -88,22 +88,22 @@ SPRINT 2  (Camera)           SPRINT 3  (Import + Clip Selector)
 
 ### Tasks
 
-| # | Task | Files |
-|---|------|-------|
-| 1.1 | File service | `services/file/fileService.ts` -- createProjectDir, createTempFile, cleanupProject, getFileSize, fileExists |
-| 1.2 | FFmpeg service core | `services/ffmpeg/ffmpegService.ts` -- executeCommand with progress, cancelExecution, getMediaInfo |
-| 1.3 | FFmpeg types | `services/ffmpeg/types.ts` -- FFmpegResult, MediaInfo, FFmpegProgress, FFmpegError |
-| 1.4 | Command builder | `services/ffmpeg/commandBuilder.ts` -- Fluent API: .input().trim().crop().rotate().flip().speed().filter().adjustments().overlayText().mixAudio().setResolution().setCodec().output().build() |
-| 1.5 | Metadata service | `services/video/metadataService.ts` -- getVideoMetadata, validateVideoConstraints |
-| 1.6 | Thumbnail service | `services/video/thumbnailService.ts` -- generateTimelineThumbnails, generateSingleThumbnail |
-| 1.7 | Trim service | `services/video/trimService.ts` -- trimVideo(uri, startMs, endMs) |
-| 1.8 | Transform service | `services/video/transformService.ts` -- cropVideo, rotateVideo, flipVideo, changeSpeed |
-| 1.9 | Filter service | `services/video/filterService.ts` -- applyFilter, applyAdjustments |
-| 1.10 | Audio service | `services/audio/audioService.ts` -- mixAudioTracks, replaceAudio, muteVideo, overlayVoiceover |
-| 1.11 | Export pipeline | `services/export/exportPipeline.ts` -- buildExportCommand, executeExport, cancelExport |
-| 1.12 | Export recovery | `services/export/exportRecovery.ts` -- saveCheckpoint, loadCheckpoint, clearCheckpoint |
-| 1.13 | Share service | `services/export/shareService.ts` -- saveToGallery, shareToApp |
-| 1.14 | Export slice | `store/slices/exportSlice.ts` |
+| # | Task | Files | Status |
+|---|------|-------|--------|
+| 1.1 | File service | `services/file/fileService.ts` -- createProjectDir, createTempFile, cleanupProject, getFileSize, fileExists | **Done** |
+| 1.2 | FFmpeg service core | `services/ffmpeg/ffmpegService.ts` -- executeCommand with progress, cancelExecution, getMediaInfo | **Done** |
+| 1.3 | FFmpeg types | `services/ffmpeg/types.ts` -- FFmpegResult, MediaInfo, FFmpegProgress, FFmpegError | **Done** |
+| 1.4 | Command builder | `services/ffmpeg/commandBuilder.ts` -- Fluent API: .input().trim().crop().rotate().flip().speed().filter().adjustments().overlayText().mixAudio().setResolution().setCodec().output().build() | **Done** |
+| 1.5 | Metadata service | `services/video/metadataService.ts` -- getVideoMetadata, validateVideoConstraints | **Done** |
+| 1.6 | Thumbnail service | `services/video/thumbnailService.ts` -- generateTimelineThumbnails, generateSingleThumbnail | **Done** |
+| 1.7 | Trim service | `services/video/trimService.ts` -- trimVideo(uri, startMs, endMs) | **Done** |
+| 1.8 | Transform service | `services/video/transformService.ts` -- cropVideo, rotateVideo, flipVideo, changeSpeed | **Done** |
+| 1.9 | Filter service | `services/video/filterService.ts` -- applyFilter, applyAdjustments | **Done** |
+| 1.10 | Audio service | `services/audio/audioService.ts` -- mixAudioTracks, replaceAudio, muteVideo, overlayVoiceover | **Done** |
+| 1.11 | Export pipeline | `services/export/exportPipeline.ts` -- buildExportCommand, executeExport, cancelExport | **Done** |
+| 1.12 | Export recovery | `services/export/exportRecovery.ts` -- saveCheckpoint, loadCheckpoint, clearCheckpoint | **Done** |
+| 1.13 | Share service | `services/export/shareService.ts` -- saveToGallery, shareToApp | **Done** |
+| 1.14 | Export slice | `store/slices/exportSlice.ts` | **Done** |
 
 **Acceptance:** Can trim a sample video file via FFmpeg, get metadata, generate thumbnails. Export pipeline builds valid command strings.
 
@@ -117,20 +117,20 @@ SPRINT 2  (Camera)           SPRINT 3  (Import + Clip Selector)
 
 ### Tasks
 
-| # | Task | Files |
-|---|------|-------|
-| 2.1 | Camera slice | `store/slices/cameraSlice.ts` |
-| 2.2 | Permission hook | `hooks/useCameraPermissions.ts` |
-| 2.3 | Camera layout | `app/camera/_layout.tsx`, `app/camera/index.tsx` |
-| 2.4 | CameraView | `components/camera/CameraView.tsx` -- VisionCamera wrapper |
-| 2.5 | RecordButton | `components/camera/RecordButton.tsx` -- Gradient circle + animated progress ring |
-| 2.6 | CameraControls | `components/camera/CameraControls.tsx` -- Flash, flip, grid, timer, close (glass pills) |
-| 2.7 | DurationSelector | `components/camera/DurationSelector.tsx` -- 10s/30s/60s AnimatedPills |
-| 2.8 | CountdownOverlay | `components/camera/CountdownOverlay.tsx` -- 3-2-1-GO Reanimated animation |
-| 2.9 | GridOverlay | `components/camera/GridOverlay.tsx` -- Rule-of-thirds |
-| 2.10 | RecordingProgress | `components/camera/RecordingProgress.tsx` -- Segmented progress bar |
-| 2.11 | Pause/resume logic | Segment saving + FFmpeg concatenation on stop |
-| 2.12 | Preview screen | `app/camera/preview.tsx`, `components/camera/CameraPreview.tsx` |
+| # | Task | Files | Status |
+|---|------|-------|--------|
+| 2.1 | Camera slice | `store/slices/cameraSlice.ts` | **Done** |
+| 2.2 | Permission hook | `hooks/useCameraPermissions.ts` | **Done** |
+| 2.3 | Camera layout | `app/camera/_layout.tsx`, `app/camera/index.tsx` | **Done** |
+| 2.4 | CameraView | `components/camera/CameraView.tsx` -- VisionCamera wrapper | **Done** |
+| 2.5 | RecordButton | `components/camera/RecordButton.tsx` -- Gradient circle + animated progress ring | **Done** |
+| 2.6 | CameraControls | `components/camera/CameraControls.tsx` -- Flash, flip, grid, timer, close (glass pills) | **Done** |
+| 2.7 | DurationSelector | `components/camera/DurationSelector.tsx` -- 10s/30s/60s AnimatedPills | Pending |
+| 2.8 | CountdownOverlay | `components/camera/CountdownOverlay.tsx` -- 3-2-1-GO Reanimated animation | Pending |
+| 2.9 | GridOverlay | `components/camera/GridOverlay.tsx` -- Rule-of-thirds | Pending |
+| 2.10 | RecordingProgress | `components/camera/RecordingProgress.tsx` -- Segmented progress bar | Pending |
+| 2.11 | Pause/resume logic | Segment saving + FFmpeg concatenation on stop | Pending |
+| 2.12 | Preview screen | `app/camera/preview.tsx`, `components/camera/CameraPreview.tsx` | Pending |
 
 **Acceptance:** Record a 10s video with pause/resume. Countdown animation plays. Preview screen shows recorded video. "Use Video" navigates forward.
 
