@@ -1,34 +1,42 @@
 /**
  * ============================================================
  *  Camera Recording Screen
- *  Full-screen camera with record button, controls, and
- *  permission handling. Composes CameraView, RecordButton,
- *  and CameraControls.
+ *  Full-screen camera with record button, controls, overlays,
+ *  pause/resume, countdown, duration selector, and grid.
  *
  *  Recording flow:
- *    1. User presses record → startRecording
- *    2. Timer ticks every 100ms → dispatch setRecordingDuration
- *    3. Auto-stops at maxDuration OR user presses stop
- *    4. onRecordingFinished → navigate to preview
+ *    1. User selects duration (10s/30s/60s) via DurationSelector
+ *    2. User presses record → countdown (if enabled) → startRecording
+ *    3. Timer ticks every 100ms → dispatch setRecordingDuration
+ *    4. User can pause/resume via pause button
+ *    5. Auto-stops at maxDuration OR user presses stop
+ *    6. onRecordingFinished → navigate to preview
  * ============================================================
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
-import { View, Text } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import type { VideoFile } from 'react-native-vision-camera';
 
 import { CameraView, type CameraViewHandle } from '@/components/camera/CameraView';
 import { RecordButton } from '@/components/camera/RecordButton';
 import { CameraControls } from '@/components/camera/CameraControls';
+import { DurationSelector } from '@/components/camera/DurationSelector';
+import { CountdownOverlay } from '@/components/camera/CountdownOverlay';
+import { GridOverlay } from '@/components/camera/GridOverlay';
+import { RecordingProgress } from '@/components/camera/RecordingProgress';
 import { useCameraPermissions } from '@/hooks/useCameraPermissions';
-import { SPACING } from '@/constants/theme';
+import { COLORS, SPACING } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   setIsRecording,
+  setIsPaused,
   setRecordingDuration,
+  setCountdownRemaining,
   resetCamera,
 } from '@/store/slices/cameraSlice';
 
@@ -44,11 +52,15 @@ export default function CameraScreen() {
   const startTimeRef = useRef<number>(0);
   const accumulatedRef = useRef<number>(0);
 
+  const [showCountdown, setShowCountdown] = useState(false);
+
   const { allGranted, requestPermissions } = useCameraPermissions();
 
   const isRecording = useAppSelector((s) => s.camera.isRecording);
+  const isPaused = useAppSelector((s) => s.camera.isPaused);
   const maxDuration = useAppSelector((s) => s.camera.maxDuration);
   const recordingDurationMs = useAppSelector((s) => s.camera.recordingDurationMs);
+  const countdownDuration = useAppSelector((s) => s.camera.countdownDuration);
 
   // ── Request permissions on mount ────────────────────────
 
@@ -65,9 +77,17 @@ export default function CameraScreen() {
     return () => {
       stopTimer();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
-  // ── Timer logic ─────────────────────────────────────────
+  // ── Timer helpers ───────────────────────────────────────
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
 
   const startTimer = useCallback(() => {
     startTimeRef.current = Date.now();
@@ -77,67 +97,97 @@ export default function CameraScreen() {
     }, 100);
   }, [dispatch]);
 
-  const stopTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
+  const pauseTimer = useCallback(() => {
+    stopTimer();
+    accumulatedRef.current += Date.now() - startTimeRef.current;
+  }, [stopTimer]);
 
-  // ── Auto-stop when hitting max duration ─────────────────
+  const resumeTimer = useCallback(() => {
+    startTimeRef.current = Date.now();
+    timerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current + accumulatedRef.current;
+      dispatch(setRecordingDuration(elapsed));
+    }, 100);
+  }, [dispatch]);
+
+  // ── Auto-stop at max duration ───────────────────────────
 
   useEffect(() => {
-    if (isRecording && recordingDurationMs >= maxDuration * 1000) {
+    if (isRecording && !isPaused && recordingDurationMs >= maxDuration * 1000) {
       handleStopRecording();
     }
-  }, [isRecording, recordingDurationMs, maxDuration]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRecording, isPaused, recordingDurationMs, maxDuration]);
 
   // ── Recording callbacks ─────────────────────────────────
 
   const handleRecordingFinished = useCallback(
     (video: VideoFile) => {
       dispatch(setIsRecording(false));
+      dispatch(setIsPaused(false));
       stopTimer();
       accumulatedRef.current = 0;
-
-      router.push({
-        pathname: '/camera/preview',
-        params: { videoPath: video.path },
-      });
+      router.push({ pathname: '/camera/preview', params: { videoPath: video.path } });
     },
-    [dispatch, router, stopTimer],
+    [dispatch, router, stopTimer]
   );
 
   const handleRecordingError = useCallback(
     (error: unknown) => {
       console.error('Recording error:', error);
       dispatch(setIsRecording(false));
+      dispatch(setIsPaused(false));
       stopTimer();
       accumulatedRef.current = 0;
     },
-    [dispatch, stopTimer],
+    [dispatch, stopTimer]
   );
 
-  // ── Start / Stop recording ──────────────────────────────
+  // ── Start / Stop / Pause / Resume ───────────────────────
 
-  const handleStartRecording = useCallback(() => {
+  const beginRecording = useCallback(() => {
     dispatch(setIsRecording(true));
     dispatch(setRecordingDuration(0));
     accumulatedRef.current = 0;
     startTimer();
-
     cameraRef.current?.startRecording({
       onRecordingFinished: handleRecordingFinished,
       onRecordingError: handleRecordingError,
     });
   }, [dispatch, startTimer, handleRecordingFinished, handleRecordingError]);
 
+  const handleStartRecording = useCallback(() => {
+    if (countdownDuration > 0) {
+      dispatch(setCountdownRemaining(countdownDuration));
+      setShowCountdown(true);
+    } else {
+      beginRecording();
+    }
+  }, [countdownDuration, dispatch, beginRecording]);
+
+  const handleCountdownComplete = useCallback(() => {
+    setShowCountdown(false);
+    dispatch(setCountdownRemaining(0));
+    beginRecording();
+  }, [dispatch, beginRecording]);
+
   const handleStopRecording = useCallback(async () => {
     stopTimer();
+    dispatch(setIsPaused(false));
     await cameraRef.current?.stopRecording();
-  }, [stopTimer]);
+  }, [stopTimer, dispatch]);
 
-  // ── Toggle record (single button press) ─────────────────
+  const handlePauseRecording = useCallback(async () => {
+    pauseTimer();
+    dispatch(setIsPaused(true));
+    await cameraRef.current?.pauseRecording();
+  }, [pauseTimer, dispatch]);
+
+  const handleResumeRecording = useCallback(async () => {
+    dispatch(setIsPaused(false));
+    resumeTimer();
+    await cameraRef.current?.resumeRecording();
+  }, [resumeTimer, dispatch]);
 
   const handleRecordPress = useCallback(() => {
     if (isRecording) {
@@ -147,7 +197,15 @@ export default function CameraScreen() {
     }
   }, [isRecording, handleStartRecording, handleStopRecording]);
 
-  // ── Format duration for display ─────────────────────────
+  const handlePausePress = useCallback(() => {
+    if (isPaused) {
+      handleResumeRecording();
+    } else {
+      handlePauseRecording();
+    }
+  }, [isPaused, handlePauseRecording, handleResumeRecording]);
+
+  // ── Helpers ─────────────────────────────────────────────
 
   const formatDuration = (ms: number): string => {
     const s = Math.floor(ms / 1000);
@@ -180,8 +238,19 @@ export default function CameraScreen() {
       {/* Full-screen camera preview */}
       <CameraView ref={cameraRef} />
 
+      {/* Recording progress bar (top edge) */}
+      <RecordingProgress />
+
       {/* Top controls overlay */}
       <CameraControls />
+
+      {/* Rule-of-thirds grid */}
+      <GridOverlay />
+
+      {/* Countdown overlay */}
+      {showCountdown && (
+        <CountdownOverlay seconds={countdownDuration} onComplete={handleCountdownComplete} />
+      )}
 
       {/* Recording duration badge */}
       {isRecording && (
@@ -194,16 +263,47 @@ export default function CameraScreen() {
             <Text className="text-[#F1F5F9] text-sm">
               {formatDuration(recordingDurationMs)}
             </Text>
+            {isPaused && (
+              <Text className="text-[#F59E0B] text-xs font-semibold">PAUSED</Text>
+            )}
           </View>
         </View>
       )}
 
-      {/* Bottom record button */}
+      {/* Bottom area: duration selector + record button + pause */}
       <View
-        className="absolute bottom-0 left-0 right-0 items-center pt-5"
+        className="absolute bottom-0 left-0 right-0 items-center"
         style={{ paddingBottom: insets.bottom + SPACING.xl }}
       >
-        <RecordButton onPress={handleRecordPress} disabled={!allGranted} />
+        {/* Duration selector (hidden during recording) */}
+        <View className="mb-4">
+          <DurationSelector />
+        </View>
+
+        {/* Record & pause buttons row */}
+        <View className="flex-row items-center gap-6">
+          {/* Pause button (only visible during recording) */}
+          {isRecording ? (
+            <Pressable
+              onPress={handlePausePress}
+              className="w-11 h-11 rounded-full bg-white/15 items-center justify-center border border-white/20"
+            >
+              <Ionicons
+                name={isPaused ? 'play' : 'pause'}
+                size={20}
+                color={COLORS.textPrimary}
+              />
+            </Pressable>
+          ) : (
+            <View className="w-11" />
+          )}
+
+          {/* Record button */}
+          <RecordButton onPress={handleRecordPress} disabled={!allGranted || showCountdown} />
+
+          {/* Spacer for symmetry */}
+          <View className="w-11" />
+        </View>
       </View>
     </View>
   );
