@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, Text } from 'react-native';
+import { View, ScrollView, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-import { COLORS, SPACING, RADIUS } from '../constants/theme';
+import { COLORS } from '../constants/theme';
 import {
   GradientText,
   GradientButton,
@@ -21,27 +21,29 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-bg-primary">
       <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerClassName="p-5 pb-10">
         {/* Header */}
-        <View style={styles.section}>
+        <View className="mb-12">
           <GradientText text="UI Showcase" size="3xl" />
-          <Text style={styles.subtitle}>Premium Components Library</Text>
+          <Text className="mt-1 text-base text-text-secondary">Premium Components Library</Text>
         </View>
 
         {/* Gradient Buttons */}
-        <View style={styles.section}>
-          <GradientText text="Gradient Buttons" size="xl" style={styles.sectionTitle} />
-          <View style={styles.row}>
+        <View className="mb-12">
+          <View className="mb-3">
+            <GradientText text="Gradient Buttons" size="xl" />
+          </View>
+          <View className="mb-2 flex-row flex-wrap items-center gap-3">
             <GradientButton title="Primary" onPress={() => {}} />
             <GradientButton title="Accent" gradient="accent" onPress={() => {}} />
           </View>
-          <View style={styles.row}>
+          <View className="mb-2 flex-row flex-wrap items-center gap-3">
             <GradientButton title="Small" size="sm" onPress={() => {}} />
             <GradientButton title="Large Glow" size="lg" glow onPress={() => {}} />
           </View>
-          <View style={styles.row}>
+          <View className="mb-2 flex-row flex-wrap items-center gap-3">
             <GradientButton title="Loading" loading onPress={() => {}} />
             <GradientButton title="Disabled" disabled onPress={() => {}} />
           </View>
@@ -51,14 +53,16 @@ export default function Home() {
             gradient="success"
             icon={<Ionicons name="checkmark-circle" size={20} color="white" />}
             onPress={() => {}}
-            style={styles.marginTop}
+            style={{ marginTop: 12 }}
           />
         </View>
 
         {/* Glow Icon Buttons */}
-        <View style={styles.section}>
-          <GradientText text="Glow Icon Buttons" size="xl" style={styles.sectionTitle} />
-          <View style={styles.row}>
+        <View className="mb-12">
+          <View className="mb-3">
+            <GradientText text="Glow Icon Buttons" size="xl" />
+          </View>
+          <View className="mb-2 flex-row flex-wrap items-center gap-3">
             <GlowIconButton icon="camera" onPress={() => {}} />
             <GlowIconButton
               icon="radio-button-on"
@@ -69,7 +73,7 @@ export default function Home() {
             <GlowIconButton icon="videocam" gradient="accent" onPress={() => {}} />
             <GlowIconButton icon="mic-off" disabled onPress={() => {}} />
           </View>
-          <View style={[styles.row, styles.marginTop]}>
+          <View className="mb-2 mt-3 flex-row flex-wrap items-center gap-3">
             <GlowIconButton icon="flash" transparent onPress={() => {}} />
             <GlowIconButton icon="camera-reverse" transparent onPress={() => {}} />
             <GlowIconButton icon="settings" transparent onPress={() => {}} />
@@ -77,20 +81,21 @@ export default function Home() {
         </View>
 
         {/* Animated Pills */}
-        <View style={styles.section}>
-          <GradientText text="Animated Pills" size="xl" style={styles.sectionTitle} />
-          <View style={styles.pillContainer}>
+        <View className="mb-12">
+          <View className="mb-3">
+            <GradientText text="Animated Pills" size="xl" />
+          </View>
+          <View className="flex-row flex-wrap gap-2 self-start rounded-full bg-bg-tertiary p-2">
             {['0.5x', '1x', '2x', '4x'].map((speed) => (
               <AnimatedPill
                 key={speed}
                 label={speed}
                 active={activePill === speed}
                 onPress={() => setActivePill(speed)}
-                style={styles.pill}
               />
             ))}
           </View>
-          <View style={[styles.pillContainer, styles.marginTop]}>
+          <View className="mt-3 flex-row flex-wrap gap-2 self-start rounded-full bg-bg-tertiary p-2">
             <AnimatedPill label="Small" size="sm" active={false} onPress={() => {}} />
             <AnimatedPill
               label="Active"
@@ -103,8 +108,10 @@ export default function Home() {
         </View>
 
         {/* Premium Slider */}
-        <View style={styles.section}>
-          <GradientText text="Premium Slider" size="xl" style={styles.sectionTitle} />
+        <View className="mb-12">
+          <View className="mb-3">
+            <GradientText text="Premium Slider" size="xl" />
+          </View>
           <GlassCard>
             <PremiumSlider
               label="Brightness"
@@ -121,24 +128,32 @@ export default function Home() {
               max={100}
               onValueChange={() => {}}
               gradient="accent"
-              style={styles.marginTop}
+              style={{ marginTop: 12 }}
             />
           </GlassCard>
         </View>
 
         {/* Glass Cards */}
-        <View style={styles.section}>
-          <GradientText text="Glass Cards" size="xl" style={styles.sectionTitle} />
-          <GlassCard style={styles.marginBottom}>
-            <Text style={styles.cardText}>Standard Glass Card</Text>
-            <Text style={styles.cardSubtext}>Blur intensity and border handling.</Text>
+        <View className="mb-12">
+          <View className="mb-3">
+            <GradientText text="Glass Cards" size="xl" />
+          </View>
+          <GlassCard style={{ marginBottom: 8 }}>
+            <Text className="text-base font-semibold text-text-primary">Standard Glass Card</Text>
+            <Text className="mt-1 text-sm text-text-secondary">
+              Blur intensity and border handling.
+            </Text>
           </GlassCard>
 
           <GlassCard glow onPress={() => {}}>
-            <View style={styles.cardRow}>
+            <View className="flex-row items-center justify-between">
               <View>
-                <Text style={styles.cardText}>Interactive & Glowing</Text>
-                <Text style={styles.cardSubtext}>Tap me to see press animation.</Text>
+                <Text className="text-base font-semibold text-text-primary">
+                  Interactive & Glowing
+                </Text>
+                <Text className="mt-1 text-sm text-text-secondary">
+                  Tap me to see press animation.
+                </Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color={COLORS.textSecondary} />
             </View>
@@ -146,93 +161,24 @@ export default function Home() {
         </View>
 
         {/* Shimmer Loaders */}
-        <View style={styles.section}>
-          <GradientText text="Shimmer Loaders" size="xl" style={styles.sectionTitle} />
-          <View style={styles.row}>
+        <View className="mb-12">
+          <View className="mb-3">
+            <GradientText text="Shimmer Loaders" size="xl" />
+          </View>
+          <View className="mb-2 flex-row flex-wrap items-center gap-3">
             <ShimmerLoader width={60} height={60} borderRadius={30} />
             <View style={{ flex: 1, marginLeft: 16 }}>
-              <ShimmerLoader width="80%" height={20} style={styles.marginBottom} />
+              <ShimmerLoader width="80%" height={20} style={{ marginBottom: 8 }} />
               <ShimmerLoader width="40%" height={16} />
             </View>
           </View>
-          <ShimmerLoader width="100%" height={120} borderRadius={16} style={styles.marginTop} />
+          <ShimmerLoader width="100%" height={120} borderRadius={16} style={{ marginTop: 12 }} />
         </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Video Editor UI Kit v1.0</Text>
+        <View className="my-6 items-center">
+          <Text className="text-xs text-text-tertiary">Video Editor UI Kit v1.0</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bgPrimary,
-  },
-  scrollContent: {
-    padding: SPACING.lg,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: SPACING['3xl'],
-  },
-  subtitle: {
-    color: COLORS.textSecondary,
-    fontSize: 16,
-    marginTop: SPACING.xs,
-  },
-  sectionTitle: {
-    marginBottom: SPACING.md,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: SPACING.md,
-    marginBottom: SPACING.sm,
-  },
-  marginTop: {
-    marginTop: SPACING.md,
-  },
-  marginBottom: {
-    marginBottom: SPACING.sm,
-  },
-  pillContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
-    backgroundColor: COLORS.bgTertiary,
-    padding: SPACING.sm,
-    borderRadius: RADIUS.full,
-    alignSelf: 'flex-start',
-  },
-  pill: {
-    // marginBottom: SPACING.xs,
-  },
-  cardText: {
-    color: COLORS.textPrimary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  cardSubtext: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    marginTop: 4,
-  },
-  cardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  footer: {
-    alignItems: 'center',
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.xl,
-  },
-  footerText: {
-    color: COLORS.textTertiary,
-    fontSize: 12,
-  },
-});

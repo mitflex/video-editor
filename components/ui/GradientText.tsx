@@ -15,7 +15,7 @@ import { StyleSheet, Text, type TextStyle } from 'react-native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { GRADIENTS, COLORS, FONT_SIZE } from '@/constants/theme';
+import { GRADIENTS, COLORS, FONT_SIZE } from '../../constants/theme';
 
 // ─── Types ─────────────────────────────────────────────────
 type GradientKey = keyof typeof GRADIENTS;
@@ -32,6 +32,8 @@ interface GradientTextProps {
   weight?: TextStyle['fontWeight'];
   /** Additional text styles */
   style?: TextStyle;
+  /** ClassName for NativeWind */
+  className?: string;
 }
 
 // ─── Component ─────────────────────────────────────────────
@@ -48,32 +50,11 @@ export function GradientText({
   return (
     <MaskedView
       maskElement={
-        <Text
-          style={[
-            styles.maskText,
-            { fontSize, fontWeight: weight },
-            style,
-          ]}
-        >
-          {text}
-        </Text>
-      }
-    >
-      <LinearGradient
-        colors={gradientColors}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      >
+        <Text style={[styles.maskText, { fontSize, fontWeight: weight }, style]}>{text}</Text>
+      }>
+      <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
         {/* Invisible text to provide correct dimensions */}
-        <Text
-          style={[
-            styles.hiddenText,
-            { fontSize, fontWeight: weight },
-            style,
-          ]}
-        >
-          {text}
-        </Text>
+        <Text style={[styles.hiddenText, { fontSize, fontWeight: weight }, style]}>{text}</Text>
       </LinearGradient>
     </MaskedView>
   );
