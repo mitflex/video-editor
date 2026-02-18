@@ -9,7 +9,7 @@
 import { CommandBuilder } from '@/services/ffmpeg/commandBuilder';
 import { executeCommand } from '@/services/ffmpeg/ffmpegService';
 import type { FFmpegProgress, FFmpegResult } from '@/services/ffmpeg/types';
-import { createTempFile } from '@/services/file/fileService';
+import { createTempFile, createProjectDir } from '@/services/file/fileService';
 
 // ─── Trim ───────────────────────────────────────────────────
 
@@ -30,6 +30,8 @@ export async function trimVideo(
   projectId: string,
   onProgress?: (progress: FFmpegProgress) => void,
 ): Promise<FFmpegResult> {
+  // Ensure project directories exist before generating temp file path
+  createProjectDir(projectId);
   const outputUri = createTempFile(projectId, 'mp4');
   const outputDurationMs = endMs - startMs;
 
@@ -38,6 +40,10 @@ export async function trimVideo(
     .trim(startMs, endMs)
     .output(outputUri)
     .build();
+
+  console.log('[TrimService] FFmpeg command:', command);
+  console.log('[TrimService] Input URI:', uri);
+  console.log('[TrimService] Output URI:', outputUri);
 
   const result = await executeCommand(command, {
     totalDurationMs: outputDurationMs,

@@ -55,10 +55,10 @@ export async function executeCommand(
   const startTime = Date.now();
   const { onProgress, totalDurationMs } = options ?? {};
 
-  // Statistics callback for progress tracking
-  const statisticsCallback = totalDurationMs
+  // Statistics callback for progress tracking — only create if both
+  // totalDurationMs and onProgress are provided
+  const statisticsCallback = (totalDurationMs && onProgress)
     ? (statistics: Statistics) => {
-        if (!onProgress) return;
 
         const timeMs = statistics.getTime();
         const progress = totalDurationMs > 0
@@ -77,22 +77,31 @@ export async function executeCommand(
       }
     : undefined;
 
-  // Execute asynchronously with callbacks
-  const session = await FFmpegKit.executeAsync(
-    command,
-    undefined, // completeCallback — we await the session instead
-    undefined, // logCallback
-    statisticsCallback,
-  );
+  // Use the synchronous execute() which waits for completion.
+  // If we have a statistics callback for progress, use executeAsync with
+  // a completeCallback wrapped in a Promise to properly wait for finish.
+  let session: FFmpegSession;
 
-  activeSession = session;
+  if (statisticsCallback) {
+    // Async path with progress tracking
+    session = await new Promise<FFmpegSession>((resolve) => {
+      FFmpegKit.executeAsync(
+        command,
+        (completedSession) => resolve(completedSession),
+        undefined,
+        statisticsCallback,
+      );
+    });
+  } else {
+    // Synchronous path — blocks until complete
+    session = await FFmpegKit.execute(command);
+  }
 
-  // Wait for completion by polling return code
+  activeSession = null;
+
   const returnCode = await session.getReturnCode();
   const durationMs = Date.now() - startTime;
   const logs = await session.getLogsAsString();
-
-  activeSession = null;
 
   if (ReturnCode.isSuccess(returnCode)) {
     return {

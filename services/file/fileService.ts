@@ -138,3 +138,30 @@ export function fileExists(uri: string): boolean {
   const pathInfo = Paths.info(uri);
   return pathInfo.exists;
 }
+
+// ─── URI Resolution ──────────────────────────────────────────
+
+/**
+ * Resolves a `content://` URI (common on Android from gallery pickers)
+ * to a local `file://` URI that FFmpeg can read.
+ *
+ * If the URI is already a file path, it is returned unchanged.
+ * The file is copied into the project's temp directory.
+ *
+ * @param uri - The source URI (may be content:// or file://).
+ * @param projectId - Project ID for temp file storage.
+ * @returns A local file:// URI.
+ */
+export function resolveContentUri(uri: string, projectId: string): string {
+  // Only content:// URIs need resolution
+  if (!uri.startsWith('content://')) return uri;
+
+  // Ensure project dirs exist
+  createProjectDir(projectId);
+
+  const destFile = new File(getTempDir(projectId), `source_${Date.now()}.mp4`);
+  const sourceFile = new File(uri);
+  sourceFile.copy(destFile);
+
+  return destFile.uri;
+}

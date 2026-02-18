@@ -7,7 +7,7 @@
  * ============================================================
  */
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { View, Text } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -34,7 +34,7 @@ interface CountdownOverlayProps {
 // ─── Component ──────────────────────────────────────────────
 
 export function CountdownOverlay({ seconds, onComplete }: CountdownOverlayProps) {
-  const currentNumber = useSharedValue(seconds);
+  const [displayNumber, setDisplayNumber] = useState(seconds);
   const scale = useSharedValue(0.5);
   const opacity = useSharedValue(1);
 
@@ -46,13 +46,19 @@ export function CountdownOverlay({ seconds, onComplete }: CountdownOverlayProps)
     onComplete();
   }, [onComplete]);
 
+  const updateNumber = useCallback((num: number) => {
+    setDisplayNumber(num);
+  }, []);
+
   useEffect(() => {
     // Animate each number: scale up + fade out, then next
     const step = ANIMATION.duration.countdown; // 800ms per number
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     for (let i = 0; i < seconds; i++) {
       const delay = i * step;
       const isLast = i === seconds - 1;
+      const number = seconds - i;
 
       // At each step: set current number, scale in, then fade out
       scale.value = withDelay(
@@ -73,20 +79,27 @@ export function CountdownOverlay({ seconds, onComplete }: CountdownOverlayProps)
         )
       );
 
-      currentNumber.value = withDelay(delay, withTiming(seconds - i, { duration: 0 }));
-
-      // Haptic on each beat
-      setTimeout(() => {
-        triggerHaptic();
-      }, delay);
+      // Update displayed number + haptic on each beat
+      timers.push(
+        setTimeout(() => {
+          updateNumber(number);
+          triggerHaptic();
+        }, delay)
+      );
 
       // Complete after last number
       if (isLast) {
-        setTimeout(() => {
-          finish();
-        }, delay + step);
+        timers.push(
+          setTimeout(() => {
+            finish();
+          }, delay + step)
+        );
       }
     }
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seconds]);
 
@@ -99,7 +112,7 @@ export function CountdownOverlay({ seconds, onComplete }: CountdownOverlayProps)
     <View className="absolute inset-0 items-center justify-center z-20 bg-black/40">
       <Animated.View style={animatedStyle}>
         <Text className="text-white text-7xl font-bold">
-          {Math.ceil(seconds - (seconds - 1))}
+          {displayNumber}
         </Text>
       </Animated.View>
     </View>

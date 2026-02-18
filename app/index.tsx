@@ -1,7 +1,7 @@
 /**
  * ============================================================
  *  Home Screen (Temporary Dev Launcher)
- *  Quick-access buttons to test Sprint 1 & 2 features.
+ *  Quick-access buttons to test Sprint 1, 2 & 3 features.
  *  This will be replaced by the real Home Screen in Sprint 10.
  * ============================================================
  */
@@ -29,6 +29,12 @@ export default function Home() {
     router.navigate(ROUTES.CAMERA);
   };
 
+  // ── Navigate to Import ───────────────────────────────
+
+  const handleOpenImport = () => {
+    router.navigate(ROUTES.IMPORT);
+  };
+
   // ── Sprint 1 Diagnostic ───────────────────────────────
 
   const handleCheckFFmpeg = async () => {
@@ -51,7 +57,7 @@ export default function Home() {
         {/* Header */}
         <View className="mb-8">
           <GradientText text="Video Editor" size="3xl" />
-          <Text className="mt-1 text-base text-[#94A3B8]">Dev Launcher — Sprint 1 & 2 Testing</Text>
+          <Text className="mt-1 text-base text-[#94A3B8]">Dev Launcher — Sprint 1, 2 & 3 Testing</Text>
         </View>
 
         {/* Sprint 2: Camera */}
@@ -72,6 +78,28 @@ export default function Home() {
               fullWidth
               gradient="warm"
               icon={<Ionicons name="camera" size={18} color="white" />}
+            />
+          </GlassCard>
+        </View>
+
+        {/* Sprint 3: Import */}
+        <View className="mb-8">
+          <GradientText text="Sprint 3: Import" size="xl" style={{ marginBottom: SPACING.md }} />
+          <GlassCard>
+            <View className="mb-3 flex-row items-center">
+              <Ionicons name="images" size={24} color={COLORS.accentTertiary} />
+              <Text className="ml-3 text-base font-semibold text-[#F1F5F9]">Import Video</Text>
+            </View>
+            <Text className="mb-4 text-sm text-[#94A3B8]">
+              Pick a video from gallery. Videos over 60s open the clip selector with draggable
+              trim handles, then FFmpeg trims and navigates to editor.
+            </Text>
+            <GradientButton
+              title="Import from Gallery"
+              onPress={handleOpenImport}
+              fullWidth
+              gradient="accent"
+              icon={<Ionicons name="cloud-upload" size={18} color="white" />}
             />
           </GlassCard>
         </View>
@@ -122,6 +150,14 @@ export default function Home() {
             <CheckItem label="PAUSED label when paused" />
             <CheckItem label="Auto-stop at max duration" />
             <CheckItem label="Preview screen with Retake / Use Video" />
+            <CheckItem label="--- Sprint 3 ---" />
+            <CheckItem label="Import opens system gallery picker" />
+            <CheckItem label="Short video (≤60s) goes straight to editor" />
+            <CheckItem label="Long video (>60s) opens clip selector" />
+            <CheckItem label="Clip selector: thumbnail strip with handles" />
+            <CheckItem label="Drag handles to select range (max 60s)" />
+            <CheckItem label="Duration indicator turns red if >60s" />
+            <CheckItem label="Confirm trims video and navigates to editor" />
           </GlassCard>
         </View>
 
